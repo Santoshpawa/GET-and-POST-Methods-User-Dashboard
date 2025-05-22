@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            font-family: sans-serif;
+            background-image: linear-gradient(to bottom,#820884,#c031ed,#da99ff,#f0bdff);
+            text-align: center;
+            min-height: 100vh;
+        }
+        #header{
+
+            text-align: center;
+            align-items: center;
+           
+            color: white;
+            
+        }
+        #main{
+            padding: 30px;
+                
+        }
+        form{
+            display: flex;
+            flex-direction: row;
+            
+        }
+        form>div{
+            display: flex;
+            flex-direction: column;
+            
+            
+            padding: 20px;
+        }
+       
+       
+        #container{
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 20px;
+           padding: 30px;
+        }
+        #container>div{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+            border: 1px solid;
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+     <div id="header">
+        <h2>User Registration</h2>
+    </div>
+    <div id="main">
+        <form action="">
+            <div>
+                <label for="name">Enter Name</label>
+                <label for="email">Email</label>
+                <label for="password">Password</label>
+            </div>
+            <div>
+                
+                <input type="text" id="name" required>
+                <input type="text" id="email" required>
+                <input type="password" id="password" required >
+            </div>
+        </form>
+         <button type="button" onclick="registerUser()">Register</button>
+    </div>
+    <div id="details">
+        <h3>User Details</h3>
+    <button onclick="displayUser()">Display</button>
+    <button onclick="clearScreen()">Clear Screen</button>
+    </div>
+    <div id="container"></div>
+</body>
+</html>
+<script>
+    let container = document.getElementById('container');
+    async function registerUser(){
+        
+        let name = document.getElementById('name');
+        let email = document.getElementById('email');
+        let password = document.getElementById('password');
+        if(name.value=='' || email.value=='' || password.value==""){
+            return;
+        }
+        let user = {
+            name : name.value,
+            email : email.value,
+            password : password.value
+        }
+        try {
+            await fetch('https://user-registration-form-b1adc-default-rtdb.asia-southeast1.firebasedatabase.app/User%20Registration%20Form.json',{
+            method: 'POST',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(user)
+        })
+            name.value='';
+            email.value='';
+            password.value='';
+            alert('Registration Successful')
+        } catch (error) {
+            alert('Registration Failed. Try again.')
+            return;
+        }
+        
+    }
+    async function displayUser(){
+        container.innerHTML='';
+        let data = await fetch('https://user-registration-form-b1adc-default-rtdb.asia-southeast1.firebasedatabase.app/User%20Registration%20Form.json');
+        let users = await data.json();
+        users = Object.entries(users).map(([id,details])=>({id,...details}));
+        users.forEach((user)=>{
+            let div = document.createElement('div');
+            let h3 = document.createElement('h3');
+            let h4 = document.createElement('h4');
+            h3.innerText = user.name;
+            h4.innerText = user.email;
+            div.append(h3,h4);
+            container.append(div);
+        })
+    }
+    function clearScreen(){
+        container.innerHTML='';
+    }
+</script>
